@@ -13,13 +13,12 @@ def shorten_sha(hex):
     return base64.urlsafe_b64encode(hex.decode("hex")).rstrip("=")
 
 
-def gen(hex):
+def gen(chunk_count, hex):
     """
     >>> gen("7046")
     'sick_sharp_nobel'
     """
     # split the hex in thirds
-    chunk_count = 3
     chunk_size = int(ceil(len(hex) / chunk_count))
     def chunk(i):
         return int(
@@ -41,12 +40,12 @@ def gen(hex):
 
 if __name__ == '__main__':
     import sys
-
+    chunk_count = 2
     if sys.argv[1:] == ['test']:
         import doctest
         doctest.testmod()
     else:
         for line in sys.stdin:
-            print gen(line.strip())
+            print gen(chunk_count, line.strip())
 
     
