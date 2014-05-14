@@ -1,0 +1,51 @@
+from math import ceil
+import struct
+import itertools
+import base64
+
+left = ["happy", "jolly", "dreamy", "sad", "angry", "pensive", "focused", "sleepy", "grave", "distracted", "determined", "stoic", "stupefied", "sharp", "agitated", "cocky", "tender", "goofy", "furious", "desperate", "hopeful", "compassionate", "silly", "lonely", "condescending", "naughty", "kickass", "drunk", "boring", "nostalgic", "ecstatic", "insane", "cranky", "mad", "jovial", "sick", "hungry", "thirsty", "elegant", "backstabbing", "clever", "trusting", "loving", "suspicious", "berserk", "high", "romantic", "prickly", "evil"]
+right = ["lovelace", "franklin", "tesla", "einstein", "bohr", "davinci", "pasteur", "nobel", "curie", "darwin", "turing", "ritchie", "torvalds", "pike", "thompson", "wozniak", "galileo", "euclid", "newton", "fermat", "archimedes", "poincare", "heisenberg", "feynman", "hawking", "fermi", "pare", "mccarthy", "engelbart", "babbage", "albattani", "ptolemy", "bell", "wright", "lumiere", "morse", "mclean", "brown", "bardeen", "brattain", "shockley", "goldstine", "hoover", "hopper", "bartik", "sammet", "jones", "perlman", "wilson", "kowalevski", "hypatia", "goodall", "mayer", "elion", "blackwell", "lalande", "kirch", "ardinghelli", "colden", "almeida", "leakey", "meitner", "mestorf", "rosalind", "sinoussi", "carson", "mcclintock", "yonath"]
+
+def shorten_sha(hex):
+    if len(hex) % 2 == 1:
+        hex += "0"
+    return base64.urlsafe_b64encode(hex.decode("hex")).rstrip("=")
+
+
+def gen(hex):
+    """
+    >>> gen("7046")
+    'sick_sharp_nobel'
+    """
+    # split the hex in thirds
+    chunk_count = 3
+    chunk_size = int(ceil(len(hex) / chunk_count))
+    def chunk(i):
+        return int(
+            hex[i*chunk_size:(i*chunk_size)+chunk_size],
+            16,
+            )
+
+    def word_set(i):
+        if i < chunk_count - 1:
+            return left
+        else:
+            return right
+
+    def word(i, val):
+        return word_set(i)[val % len(word_set(i))]
+        
+    words = (word(i, chunk(i)) for i in range(chunk_count))
+    return "_".join(words) + "_" + shorten_sha(hex)
+
+if __name__ == '__main__':
+    import sys
+
+    if sys.argv[1:] == ['test']:
+        import doctest
+        doctest.testmod()
+    else:
+        for line in sys.stdin:
+            print gen(line.strip())
+
+    
